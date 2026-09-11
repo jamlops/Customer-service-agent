@@ -1,4 +1,4 @@
-# 客服 AI Agent 系统
+<img width="2547" height="1407" alt="image" src="https://github.com/user-attachments/assets/fc941ce1-3254-442b-ba09-f7c08cd61e58" /># 客服 AI Agent 系统
 
 一个可运行、可扩展的智能客服系统骨架：**Agent 调度引擎 + 多工具编排 + 上下路由 + 三层对话记忆**，
 支撑连续多轮交互。核心链路零第三方依赖（纯标准库），离线即可跑通完整演示与测试；
@@ -53,8 +53,10 @@ reasoning effort high。API Key 只从 `DEEPSEEK_API_KEY`（或兼容的 `LLM_AP
 ### 前台与人工客服后台
 
 - 客户前台：`http://127.0.0.1:8000/`
-- 客服后台：`http://127.0.0.1:8000/admin`
+<img width="2526" height="1404" alt="image" src="https://github.com/user-attachments/assets/88528c55-db9c-4380-bdaf-24f694cc917a" />
 
+- 客服后台：`http://127.0.0.1:8000/admin`
+<img width="2547" height="1407" alt="image" src="https://github.com/user-attachments/assets/95d1d2ac-8480-460a-a96f-7c94ed6af00b" />
 转人工后会创建持久化工单并进入 `waiting` 状态。此时 DeepSeek 读取短期对话、长期摘要和
 已知槽位，作为“排队托管 Agent”继续回应，但会明确保持 AI 身份，不承诺接通时间，也不编造
 订单事实。后台客服点击“接单”后工单变为 `active`，客户新消息只进入人工会话，不再触发模型；
@@ -90,6 +92,7 @@ AI 图标手动请求；建议只进入草稿区，由客服确认后发送。�
 追加消息、增加轮次或改动槽位；工具层额外屏蔽 `create_ticket`、`submit_refund` 等写操作，
 路由落到“转人工/无法判定”时改由排队托管 Agent 直接生成草稿，保证预回答只读、无业务副作用。
 返回结果会附带来源 Agent、路由原因与调用工具，后台面板在模型名旁同步展示来源 Agent。
+
 
 内置演示场景（`main.py`）一次跑完全部核心机制：
 
