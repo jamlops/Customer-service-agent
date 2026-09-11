@@ -1,4 +1,4 @@
-<img width="2547" height="1407" alt="image" src="https://github.com/user-attachments/assets/fc941ce1-3254-442b-ba09-f7c08cd61e58" /># 客服 AI Agent 系统
+# 客服 AI Agent 系统
 
 一个可运行、可扩展的智能客服系统骨架：**Agent 调度引擎 + 多工具编排 + 上下路由 + 三层对话记忆**，
 支撑连续多轮交互。核心链路零第三方依赖（纯标准库），离线即可跑通完整演示与测试；
