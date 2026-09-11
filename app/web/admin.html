@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>远舟客服管理后台</title>
+  <link rel="stylesheet" href="/static/styles.css?v=3">
+  <link rel="stylesheet" href="/static/admin.css?v=5">
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <aside class="admin-nav">
+      <div class="brand admin-brand"><span class="brand-mark"><i data-lucide="headphones"></i></span><span><strong>远舟客服</strong><small>Support Admin</small></span></div>
+      <nav>
+        <button class="nav-item" id="dashboardNav"><i data-lucide="layout-dashboard"></i><span>数据面板</span></button>
+        <button class="nav-item active" id="ticketsNav"><i data-lucide="inbox"></i><span>工单队列</span><b id="navWaiting">0</b></button>
+        <button class="nav-item" id="aiSettingsNav"><i data-lucide="settings-2"></i><span>AI 设置</span></button>
+        <a class="nav-item" href="/"><i data-lucide="external-link"></i><span>客户前台</span></a>
+      </nav>
+      <div class="admin-user"><span class="avatar avatar-user">客</span><span><strong>客服 001</strong><small>在线</small></span></div>
+    </aside>
+
+    <main class="ticket-panel">
+      <header class="admin-header"><div><h1>人工工单</h1><p>Agent 托管中的客户将在这里等待分配</p></div><button class="icon-button" id="refreshTickets" title="刷新"><i data-lucide="refresh-cw"></i></button></header>
+      <div class="ticket-search"><i data-lucide="search"></i><input id="ticketSearch" type="search" placeholder="搜索工单、客户或备注"></div>
+      <div class="ticket-stats">
+        <button class="stat active" data-status="waiting"><span>待分配</span><strong id="waitingCount">0</strong></button>
+        <button class="stat" data-status="active"><span>处理中</span><strong id="activeCount">0</strong></button>
+        <button class="stat" data-status="closed"><span>已结束</span><strong id="closedCount">0</strong></button>
+      </div>
+      <section class="tickets" id="ticketList"><div class="admin-empty">暂无待处理工单</div></section>
+    </main>
+
+    <section class="workbench">
+      <div class="dashboard-view" id="dashboardView" hidden>
+        <header class="dashboard-header"><div><h1>服务数据</h1><p>人工工单趋势、峰值与客户标记概览</p></div><button class="icon-button" id="refreshDashboard" title="刷新数据"><i data-lucide="refresh-cw"></i></button></header>
+        <div class="metric-grid" id="metricGrid"></div>
+        <section class="dashboard-section">
+          <div class="section-heading"><div><h2>工单趋势分析</h2><p>按本机时间统计，数据随工单实时更新</p></div></div>
+          <div class="analytics-grid">
+            <figure class="chart-panel chart-panel-wide">
+              <figcaption><div><strong>最近 7 天工单</strong><span>每日新增与完成对比</span></div><b id="weeklyPeak"></b></figcaption>
+              <div class="chart-legend"><span class="legend-created">新增</span><span class="legend-completed">完成</span></div>
+              <div class="bar-chart" id="weeklyChart" role="img" aria-label="最近七天新增和完成工单条状图"></div>
+            </figure>
+            <figure class="chart-panel">
+              <figcaption><div><strong>工单高峰时段</strong><span>全部工单按创建小时分布</span></div><b id="hourlyPeak"></b></figcaption>
+              <div class="line-chart" id="hourlyChart"></div>
+            </figure>
+            <figure class="chart-panel">
+              <figcaption><div><strong>本月工单趋势</strong><span>当前自然月每日新增量</span></div><b id="monthlyPeak"></b></figcaption>
+              <div class="line-chart" id="monthlyChart"></div>
+            </figure>
+          </div>
+        </section>
+        <section class="dashboard-section"><h2>客户标记分布</h2><div class="tag-chart" id="tagChart"></div></section>
+      </div>
+      <div class="settings-view" id="aiSettingsView" hidden>
+        <header class="dashboard-header"><div><h1>AI 设置</h1><p>管理客户端 DeepSeek 调用与客服预回答模型</p></div><button class="icon-button" id="refreshAISettings" title="刷新设置" aria-label="刷新设置"><i data-lucide="refresh-cw"></i></button></header>
+        <div class="settings-content">
+          <section class="setting-row">
+            <div class="setting-copy"><span class="setting-icon"><i data-lucide="power"></i></span><div><h2>DeepSeek 全局开关</h2><p>关闭后，客户端对话、摘要和智能路由均不再请求 DeepSeek，自动使用离线规则兜底。</p><small id="deepseekKeyStatus"></small></div></div>
+            <label class="switch-control"><input type="checkbox" id="deepseekEnabled" role="switch"><span aria-hidden="true"></span><b id="deepseekSwitchLabel">已启用</b></label>
+          </section>
+          <section class="setting-section">
+            <div class="setting-copy"><span class="setting-icon"><i data-lucide="message-square-more"></i></span><div><h2>客服预回答模型</h2><p>选择客服工作台自动预回答和手动 AI 建议所使用的模型。</p></div></div>
+            <div class="provider-options" id="suggestionProviders" role="radiogroup" aria-label="客服预回答模型"></div>
+            <p class="effective-provider" id="effectiveProvider" aria-live="polite"></p>
+          </section>
+          <p class="settings-save-state" id="settingsSaveState" aria-live="polite">设置修改后自动保存</p>
+        </div>
+      </div>
+      <div class="workbench-empty" id="workbenchEmpty"><i data-lucide="messages-square"></i><strong>选择一张工单开始处理</strong><span>接单后，客户前台将自动切换为人工服务</span></div>
+      <div class="workbench-content" id="workbenchContent" hidden>
+        <header class="case-header"><div><span class="priority" id="casePriority">普通</span><h2 id="caseTitle"></h2><p id="caseMeta"></p></div><div class="case-actions"><button class="claim-button" id="claimTicket"><i data-lucide="hand"></i>接单</button><button class="close-ticket" id="closeTicket" hidden><i data-lucide="circle-check"></i>结束会话</button></div></header>
+        <div class="case-layout">
+          <div class="admin-conversation">
+            <div class="typing-status" id="customerTyping"></div>
+            <div class="admin-messages" id="adminMessages"></div>
+            <div class="reply-reference" id="adminReplyReference" hidden></div>
+            <div class="attachment-preview" id="adminAttachmentPreview"></div>
+            <div class="ai-suggestion" id="aiSuggestion" hidden><div><i data-lucide="sparkles"></i><strong id="aiSuggestionTitle">AI 预回答</strong><small id="aiModel"></small></div><p id="aiSuggestionText"></p><div><button type="button" id="useSuggestion">采用</button><button type="button" id="discardSuggestion">忽略</button></div></div>
+            <form class="admin-composer" id="adminReplyForm">
+              <div class="composer-tools"><button type="button" id="adminImage" title="上传图片"><i data-lucide="image-plus"></i></button><button type="button" id="adminEmoji" title="插入 Emoji"><i data-lucide="smile"></i></button><button type="button" id="requestAI" title="请求 AI 生成预回答"><i data-lucide="sparkles"></i></button></div>
+              <textarea id="adminReply" rows="2" placeholder="回复客户…" disabled></textarea>
+              <button type="submit" id="adminSend" disabled><i data-lucide="send"></i>发送</button>
+              <input type="file" id="adminFileInput" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+            </form>
+            <div class="emoji-picker" id="adminEmojiPicker" hidden></div>
+          </div>
+          <aside class="customer-context">
+            <h3>客户上下文</h3>
+            <dl id="caseDetails"></dl>
+            <h3>记忆槽位</h3>
+            <div class="slot-list" id="adminSlots"></div>
+            <h3>长期摘要</h3>
+            <p id="adminSummary">尚未生成</p>
+            <h3>客户标记</h3>
+            <div class="customer-tags" id="customerTags"></div>
+            <h3>客服备注</h3>
+            <textarea class="customer-note" id="customerNote" rows="5" placeholder="记录客户偏好、沟通要点…"></textarea>
+            <button class="save-profile" id="saveProfile"><i data-lucide="save"></i>保存客户资料</button>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="message-menu" id="messageMenu" hidden><button id="replyMessage"><i data-lucide="reply"></i>回复</button><button id="copyMessage"><i data-lucide="copy"></i>复制</button></div>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="/static/admin.js?v=6"></script>
+</body>
+</html>

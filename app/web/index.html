@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <title>远舟客服工作台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=4">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark"><i data-lucide="headphones"></i></span>
+        <span><strong>远舟客服</strong><small>Agent Console</small></span>
+        <button class="icon-button mobile-only" id="closeSidebar" title="关闭会话栏" aria-label="关闭会话栏">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <button class="new-chat" id="newChat">
+        <i data-lucide="plus"></i><span>新建会话</span>
+      </button>
+
+      <div class="sidebar-label">最近会话</div>
+      <nav class="session-list" id="sessionList" aria-label="最近会话"></nav>
+
+      <div class="operator">
+        <span class="avatar avatar-user">客</span>
+        <span class="operator-copy"><strong>客服工作台</strong><small id="connectionText">正在连接服务</small></span>
+        <span class="status-dot" id="statusDot" aria-label="服务状态"></span>
+      </div>
+    </aside>
+
+    <main class="conversation">
+      <header class="topbar">
+        <button class="icon-button mobile-only" id="openSidebar" title="打开会话栏" aria-label="打开会话栏">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="active-agent">
+          <span class="agent-avatar" id="agentAvatar"><i data-lucide="sparkles"></i></span>
+          <span><strong id="agentName">智能调度</strong><small><span class="online-dot"></span><span id="serviceStatus">在线</span></small></span>
+        </div>
+        <div class="top-actions">
+          <span class="model-badge" id="modelBadge">deepseek-v4-flash</span>
+          <button class="icon-button" id="toggleInspector" title="查看执行详情" aria-label="查看执行详情">
+            <i data-lucide="panel-right"></i>
+          </button>
+        </div>
+      </header>
+
+      <section class="messages" id="messages" aria-live="polite">
+        <div class="welcome" id="welcome">
+          <span class="welcome-mark"><i data-lucide="headset"></i></span>
+          <h1>您好，需要处理什么问题？</h1>
+          <p>我会为您连接合适的客服专员。</p>
+          <div class="quick-actions">
+            <button data-prompt="查询订单 SO20260905001 的物流">查询物流</button>
+            <button data-prompt="我想申请退款">申请退款</button>
+            <button data-prompt="你们支持7天无理由退货吗？">退货政策</button>
+            <button data-prompt="我要转人工客服">转人工</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="composer-wrap">
+        <div class="agent-switcher" id="agentSwitcher" role="tablist" aria-label="选择客服 Agent"></div>
+        <div class="handoff-banner" id="handoffBanner"></div>
+        <form class="composer" id="chatForm">
+          <div class="media-tools" aria-label="消息工具">
+            <button type="button" class="composer-icon media-tool" id="customerImage" title="上传图片" aria-label="上传图片"><i data-lucide="image-plus"></i><span class="attachment-count" id="attachmentCount" hidden>0</span></button>
+            <button type="button" class="composer-icon media-tool" id="customerEmoji" title="插入 Emoji" aria-label="插入 Emoji" aria-expanded="false" aria-controls="customerEmojiPicker"><i data-lucide="smile-plus"></i></button>
+          </div>
+          <textarea id="messageInput" rows="1" maxlength="2000" placeholder="输入消息…" aria-label="输入消息"></textarea>
+          <button type="submit" class="send-button" id="sendButton" title="发送" aria-label="发送">
+            <i data-lucide="arrow-up"></i>
+          </button>
+          <input type="file" id="customerFileInput" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+        </form>
+        <div class="attachment-preview" id="customerAttachmentPreview"></div>
+        <div class="emoji-picker customer-emoji-picker" id="customerEmojiPicker" hidden><div class="emoji-picker-heading"><strong>常用表情</strong><button type="button" id="closeCustomerEmoji" aria-label="关闭表情面板"><i data-lucide="x"></i></button></div><div class="emoji-grid" id="customerEmojiGrid"></div></div>
+        <div class="typing-status" id="operatorTyping"></div>
+        <div class="composer-meta"><span>Enter 发送 · Shift + Enter 换行</span><span id="charCount">0 / 2000</span></div>
+      </footer>
+    </main>
+
+    <aside class="inspector" id="inspector">
+      <header class="inspector-header">
+        <strong>执行详情</strong>
+        <button class="icon-button" id="closeInspector" title="关闭执行详情" aria-label="关闭执行详情">
+          <i data-lucide="x"></i>
+        </button>
+      </header>
+
+      <section class="detail-section">
+        <h2>当前路由</h2>
+        <div class="route-row">
+          <span class="agent-avatar small" id="routeIcon"><i data-lucide="sparkles"></i></span>
+          <span><strong id="routeAgent">等待消息</strong><small id="routeReason">尚未执行调度</small></span>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h2>工具调用</h2>
+        <div class="empty-detail" id="toolList">暂无调用</div>
+      </section>
+
+      <section class="detail-section">
+        <h2>会话记忆</h2>
+        <dl class="memory-list" id="memoryList">
+          <div><dt>会话轮次</dt><dd id="turnCount">0</dd></div>
+          <div><dt>长期摘要</dt><dd id="summaryStatus">未生成</dd></div>
+        </dl>
+        <div class="slot-list" id="slotList"></div>
+      </section>
+
+      <section class="detail-section model-section">
+        <h2>模型</h2>
+        <div class="model-row"><i data-lucide="cpu"></i><span><strong id="modelName">deepseek-v4-flash</strong><small id="modeName">pipeline · fallback</small></span></div>
+      </section>
+    </aside>
+  </div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script src="/static/app.js?v=4"></script>
+</body>
+</html>

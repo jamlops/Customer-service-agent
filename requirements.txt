@@ -1,0 +1,4 @@
+# 核心链路（CLI 演示 + 单元测试）零第三方依赖，纯 Python 标准库即可运行。
+# 以下为可选组件：
+fastapi>=0.110     # Web API 服务（app/api/server.py）
+uvicorn>=0.29      # fastapi 的 ASGI 服务器

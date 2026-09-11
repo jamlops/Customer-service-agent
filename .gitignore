@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+data/sessions/
+data/tickets/
+data/customers/
+data/uploads/
+data/settings/
+.pytest_cache/
+.env
